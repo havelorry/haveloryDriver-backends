@@ -1,1 +1,1 @@
-web: gunicorn havelorryapp.wsgi --log-file -
+web: gunicorn bhole.wsgi --log-file -
