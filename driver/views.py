@@ -5,10 +5,16 @@ from .serializations import ProfileDetailSerializer,ProfileSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate
-
+from django.contrib.auth.models import User
+from .models import Driver
 # Create your views here.
 
 class DriverPofile(APIView):
+    def get_object(self, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+           raise_exception=True 
     def post(self,request,format=None):
         print ("inside post method")
         profile_serializer=ProfileSerializer(data=request.data)
@@ -25,6 +31,46 @@ class DriverPofile(APIView):
                 return Response({"massage":"saved successfully"})
         return Response("done")
 
+    def get(self,request,format=None):
+        username=request.query_params.get("username")
+        print(username)
+        #user=User.objects.get(username=username)
+        user = self.get_object(username)
+        if user==None:
+            return Response({"error":"User does not exist"})
+        else:    
+            username1=Driver.objects.get(username=username)
+            print(username1)
+            detail_serilaizer=ProfileDetailSerializer(username1)
+            serializer=ProfileSerializer(user)
+            serializer.data['address']=detail_serilaizer['address']
+            print (serializer.data)
+            return Response({"username":detail_serilaizer.data['username'],"email":serializer.data['email'],"first_name":serializer.data['first_name'],"last_name":serializer.data['last_name'],"address":detail_serilaizer.data['address'],"mobile":detail_serilaizer.data['mobile'],"vehicle_number":detail_serilaizer.data['vehicle_number'],"locations":detail_serilaizer.data['locations'],"age":detail_serilaizer.data['age']})    
+    def put(self,request,format=None):
+        user_detail=User.objects.get(username=request.data.get('username'))
+        update_serializer=ProfileSerializer(instance=user_detail,data=request.data,partial=True)
+        if update_serializer.is_valid(raise_exception=True):
+            print ("updation done1")
+            update_serializer.save()
+            driver_detail=Driver.objects.get(username=request.data.get('username'))
+
+            profile_detail_serializer=ProfileDetailSerializer(instance=driver_detail,data=request.data,partial=True)
+            if profile_detail_serializer.is_valid(raise_exception=True):
+                print ("updation done2")
+                profile_detail_serializer.save()
+                return Response({"massage":"Profile update successfully","status":status.HTTP_200_OK})
+        return Response({"massage":"Something went wrong","status":status.HTTP_400_BAD_REQUEST})
+    def delete(self, request, format=None):
+        username=request.query_params.get("username")
+
+        event = self.get_object(username)
+        if event==None:
+            return Response({"error":"User does not exist"})
+        else:
+            event.delete()
+            return Response({"massage":"Deletion successfully","status":status.HTTP_204_NO_CONTENT})
+            
+     
 class Login(APIView):
     def post(self,request,format=None):
         username = request.data.get("username")
