@@ -25,6 +25,6 @@ class Ride(models.Model):
     driver_id=models.IntegerField()
 
 class activeLogin(models.Model):
-    username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole")
+    username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole",unique=True)
     active=models.CharField(max_length=100,default=0)
     location=models.CharField(max_length=100,null=True)
