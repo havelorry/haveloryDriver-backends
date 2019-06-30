@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Driver
+from .models import Driver,activeLogin
 from django.contrib.auth.models import User
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -37,5 +37,20 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
         model=Driver
         fields='__all__'            
 
+class ActiveLoginSerializer(serializers.ModelSerializer):
+    def create(self,validated_data):
+        driver=activeLogin.objects.create(**validated_data)
+        driver.save()
+        return driver
+    def update(self,instance,validate_data):
+        instance.active=validate_data.get('active',instance.active)
+        instance.location=validate_data.get('location',instance.location)
+
+        
+        instance.save()
+        return instance
+    class Meta:
+        model=activeLogin
+        fields='__all__'
 #class DriverDetailSerializer(serializers.ModelSerializer):
     

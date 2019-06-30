@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializations import ProfileDetailSerializer,ProfileSerializer
+from .serializations import ProfileDetailSerializer,ProfileSerializer,ActiveLoginSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Driver
+from .models import Driver,activeLogin
+from rest_framework import generics
+
 # Create your views here.
 
 class DriverPofile(APIView):
@@ -84,8 +86,41 @@ class Login(APIView):
             return Response({'error': 'Invalid Credentials'},
                             status=status.HTTP_404_NOT_FOUND)
         token, _ = Token.objects.get_or_create(user=user)
+       
         return Response({"massage":"Login Successfully","token":token.key})
     #def get(self,request,format=None):
+class ActiveLogin(APIView):
+    def post(self,request,format=None):
+        print ("inside post method")
+        active_serializer=ActiveLoginSerializer(data=request.data)
+        if active_serializer.is_valid(raise_exception=True):
+            active_serializer.save()
+            return Response({"massage":"activation successfully"})
+        else:
+            return Response({"massage":"activatiion failed"})    
+
+    def put(self,request):
+        active_user=activeLogin.objects.get(username=request.data.get('username'))
+        active_login_serializer=ActiveLoginSerializer(instance=active_user,data=request.data,partial=True)    
+        if active_login_serializer.is_valid(raise_exception=True):
+            active_login_serializer.save()
+            return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
+        return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})    
+    
+
+class ActiveDrivers(generics.ListAPIView):
+    serializer_class = ActiveLoginSerializer
+    
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        location=self.request.query_params.get("location")
+        print("location=",location)
+        #user = self.request.user
+        return activeLogin.objects.filter(active=1,location=location)
+
 
 
 

@@ -12,3 +12,19 @@ class Driver(models.Model):
 
     def __str__(self):
         return '%s , %s'%(self.username,self.locations)
+class Ride(models.Model):
+    customer_id=models.BigIntegerField()
+    status=models.IntegerField()
+    dest_latitude=models.FloatField()
+    dest_logitude=models.FloatField()
+    origin_latitude=models.FloatField()
+    origin_longitude=models.FloatField()
+    origin_string=models.CharField(max_length=100)
+    dest_string=models.CharField(max_length=100)    
+
+    driver_id=models.IntegerField()
+
+class activeLogin(models.Model):
+    username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole")
+    active=models.CharField(max_length=100,default=0)
+    location=models.CharField(max_length=100,null=True)
