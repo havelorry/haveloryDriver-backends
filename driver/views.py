@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .models import Driver,activeLogin
 from rest_framework import generics
-
+from googlegeocoder import GoogleGeocoder
 # Create your views here.
 
 class DriverPofile(APIView):
@@ -90,8 +90,22 @@ class Login(APIView):
         return Response({"massage":"Login Successfully","token":token.key})
     #def get(self,request,format=None):
 class ActiveLogin(APIView):
+    def get_object(self, username):
+        try:
+            return activeLogin.objects.get(username=username)
+        except activeLogin.DoesNotExist:
+           raise_exception=True 
     def post(self,request,format=None):
-        print ("inside post method")
+        print ("inside post method",request.data)
+        geocoder = GoogleGeocoder("AIzaSyAgg9zZG2mXS6QzgsM3wUbLIljdU6RBmRw")
+        search = geocoder.get(request.data['location'])
+        print(search)
+        print (search[0].geometry.location.lat, search[0].geometry.location.lng)
+        location=request.data['location']
+        request.data['latitude']=search[0].geometry.location.lat
+        request.data['longitude']=search[0].geometry.location.lng
+        
+        print(location)
         active_serializer=ActiveLoginSerializer(data=request.data)
         if active_serializer.is_valid(raise_exception=True):
             active_serializer.save()
@@ -100,11 +114,23 @@ class ActiveLogin(APIView):
             return Response({"massage":"activatiion failed"})    
 
     def put(self,request):
-        active_user=activeLogin.objects.get(username=request.data.get('username'))
-        active_login_serializer=ActiveLoginSerializer(instance=active_user,data=request.data,partial=True)    
-        if active_login_serializer.is_valid(raise_exception=True):
-            active_login_serializer.save()
-            return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
+        #active_user=activeLogin.objects.get(username=request.data.get('username'))
+        active_user=self.get_object(request.data.get('username'))
+        if active_user==None:
+            return Response({"error":"User does not exist"})
+        else:
+            geocoder = GoogleGeocoder("AIzaSyAgg9zZG2mXS6QzgsM3wUbLIljdU6RBmRw")
+            search = geocoder.get(request.data['location'])
+            print(search)
+            print (search[0].geometry.location.lat, search[0].geometry.location.lng)
+            location=request.data['location']
+            request.data['latitude']=search[0].geometry.location.lat
+            request.data['longitude']=search[0].geometry.location.lng
+            
+            active_login_serializer=ActiveLoginSerializer(instance=active_user,data=request.data,partial=True)    
+            if active_login_serializer.is_valid(raise_exception=True):
+                active_login_serializer.save()
+                return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
         return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})    
     
 
@@ -117,9 +143,13 @@ class ActiveDrivers(generics.ListAPIView):
         for the currently authenticated user.
         """
         location=self.request.query_params.get("location")
+        geocoder = GoogleGeocoder("AIzaSyAgg9zZG2mXS6QzgsM3wUbLIljdU6RBmRw")
+        search = geocoder.get(location)
+        print(search)
+        print (search[0].geometry.location.lat, search[0].geometry.location.lng)
         print("location=",location)
         #user = self.request.user
-        return activeLogin.objects.filter(active=1,location=location)
+        return activeLogin.objects.filter(active=1,latitude=search[0].geometry.location.lat,longitude=search[0].geometry.location.lng)
 
 
 

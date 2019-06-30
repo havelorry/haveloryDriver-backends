@@ -27,4 +27,5 @@ class Ride(models.Model):
 class activeLogin(models.Model):
     username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole",unique=True)
     active=models.CharField(max_length=100,default=0)
-    location=models.CharField(max_length=100,null=True)
+    latitude=models.FloatField(default=0)
+    longitude=models.FloatField(default=0)
