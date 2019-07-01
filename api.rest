@@ -1,1 +1,18 @@
-GET http://localhost:8000/driver/active_drivers?lat= 27.176670&lng=78.008072 HTTP/1.1
+###remote
+GET http://have-drivers.herokuapp.com/driver/active_drivers?lat= 26.176670&lng=78.008072 HTTP/1.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###local
+GET http://localhost:8000/driver/active_drivers?lat= 26.176670&lng=78.008072 HTTP/1.1
