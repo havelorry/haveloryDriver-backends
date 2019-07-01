@@ -62,6 +62,7 @@ class DriverPofile(APIView):
                 profile_detail_serializer.save()
                 return Response({"massage":"Profile update successfully","status":status.HTTP_200_OK})
         return Response({"massage":"Something went wrong","status":status.HTTP_400_BAD_REQUEST})
+    
     def delete(self, request, format=None):
         username=request.query_params.get("username")
 
@@ -89,6 +90,7 @@ class Login(APIView):
        
         return Response({"massage":"Login Successfully","token":token.key})
     #def get(self,request,format=None):
+
 class ActiveLogin(APIView):
     def post(self,request,format=None):
         print ("inside post method")
@@ -107,19 +109,49 @@ class ActiveLogin(APIView):
             return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
         return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})    
     
-
-class ActiveDrivers(generics.ListAPIView):
-    serializer_class = ActiveLoginSerializer
+def cvt(loc):
+    import json
+    temp = loc.get('username_id')
+    driver = Driver.objects.get(username=temp)
     
-    def get_queryset(self):
-        """
-        This view should return a list of all the purchases
-        for the currently authenticated user.
-        """
-        location=self.request.query_params.get("location")
-        print("location=",location)
-        #user = self.request.user
-        return activeLogin.objects.filter(active=1,location=location)
+    return {
+        **loc,
+        'workers':driver.__dict__.get('workers'),
+        'location':json.loads(loc.get('location'))
+    }
+
+
+def level_1(loc):
+    import json
+    return {
+        **loc,
+        'location':json.loads(loc.get('location'))
+    }
+
+class ActiveDrivers(APIView):
+    
+    
+    def get(self, request, format=None):
+        from django.http import JsonResponse
+        if not (request.GET.__contains__('lat') and request.GET.__contains__('lng')):
+            return JsonResponse({
+                'message':'Missing required params'
+            })
+        
+        lat = request.GET.__getitem__('lat')
+        lng = request.GET.__getitem__('lng')    
+
+        
+        active = activeLogin.objects.filter(active=1)
+        bc = list(active.values())
+        mc = [ level_1(x) for x in bc]
+
+        print(mc)
+
+        return JsonResponse(
+            mc,
+            safe=False
+        )    
 
 
 

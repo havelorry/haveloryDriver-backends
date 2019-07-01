@@ -19,6 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model=User
         fields='__all__'
 
+
 class ProfileDetailSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
         driver=Driver.objects.create(**validated_data)
@@ -39,9 +40,10 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
 class ActiveLoginSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
-        driver=activeLogin.objects.create(**validated_data)
+        driver=activeLogin.objects.update_or_create(**validated_data)
         driver.save()
         return driver
+    
     def update(self,instance,validate_data):
         instance.active=validate_data.get('active',instance.active)
         instance.location=validate_data.get('location',instance.location)
