@@ -6,9 +6,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Driver,activeLogin
+from .models import Driver,activeLogin,AppSetting
 from rest_framework import generics
-
+from .vincenty import vincenty_inverse
 # Create your views here.
 
 class DriverPofile(APIView):
@@ -117,45 +117,102 @@ def cvt(loc):
     return {
         **loc,
         'workers':driver.__dict__.get('workers'),
-        'location':json.loads(loc.get('location'))
     }
 
 
-def level_1(loc):
+def level_1(loc,coords):
     import json
+    _coords = json.loads(loc.get('location'))
+    _flt_x = float(
+        _coords.get('x')
+    )
+
+    _flt_y = float(
+        _coords.get('y')
+    )
+
+
+    _flt2_x = float(
+        coords[0]
+    )
+
+    _flt2_y = float(
+        coords[1]
+    )    
+
+    _distance = vincenty_inverse([
+        _flt2_x,
+        _flt2_y
+    ],[
+       _flt_x,
+       _flt_y 
+    ])
+
     return {
         **loc,
-        'location':json.loads(loc.get('location'))
+        'location':json.loads(loc.get('location')),
+        'distance':_distance.km,
+        'display':_distance.km <= 108 and loc.get('status') == 'available' 
     }
+
 
 class ActiveDrivers(APIView):
     
     
     def get(self, request, format=None):
         from django.http import JsonResponse
+        
         if not (request.GET.__contains__('lat') and request.GET.__contains__('lng')):
             return JsonResponse({
                 'message':'Missing required params'
             })
-        
+
         lat = request.GET.__getitem__('lat')
         lng = request.GET.__getitem__('lng')    
 
         
         active = activeLogin.objects.filter(active=1)
         bc = list(active.values())
-        mc = [ level_1(x) for x in bc]
-
-        print(mc)
-
+        mc = [ level_1(x,[lat,lng]) for x in bc]
+        dk = [cvt(x) for x in mc if x.get('display') is True]
+        
         return JsonResponse(
-            mc,
+            dk,
             safe=False
         )    
 
 
 
 
+class RideCreationView(APIView):
+    pass
+
+
+
+
+def calculate(request, incl=False):
+    basePrice = AppSetting.objects.get(name="BASE_PRICE").value
+    
+    print(request.POST)
+
+    if incl:
+        pass
+    else:
+        pass
+
+class FareCalculation(APIView):
+    def get(sef ,request, format=None):
+        try:
+            includeDriverDistance = AppSetting.objects.get(name="INCLUDE_DRIVER_DISTANCE").value
+
+            if includeDriverDistance is 0:
+                calculate(request,incl=False)
+            else:
+                calculate(request,incl=True)
+
+        except :
+            print('Loading failed')
+            
 
 
 

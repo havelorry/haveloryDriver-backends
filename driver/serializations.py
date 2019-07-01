@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Driver,activeLogin
+from .models import Driver,activeLogin, Ride
 from django.contrib.auth.models import User
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -55,4 +55,21 @@ class ActiveLoginSerializer(serializers.ModelSerializer):
         model=activeLogin
         fields='__all__'
 #class DriverDetailSerializer(serializers.ModelSerializer):
+    
+class RideSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ride,
+        fields = '__all__'
+
+    def create(self,validated_data):
+        ride = Ride.objects.create(**validated_data)
+        ride.save()
+        return ride
+
+
+    def update(self,instance,validated_data):
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        return instance
+
     

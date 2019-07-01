@@ -37,3 +37,14 @@ class activeLogin(models.Model):
 
     def __str__(self):
         return "%s --> %s"%(self.location,self.username)
+
+
+
+class AppSetting(models.Model):
+    name  = models.CharField(max_length = 55)
+    value = models.PositiveIntegerField(default=0)
+
+
+    def __str__(self):
+        return "%s %d"%(self.name,self.value)
+        
