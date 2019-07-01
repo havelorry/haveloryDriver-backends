@@ -158,7 +158,6 @@ def level_1(loc,coords):
 
 class ActiveDrivers(APIView):
     
-    
     def get(self, request, format=None):
         from django.http import JsonResponse
         
