@@ -110,9 +110,11 @@ class ActiveLogin(APIView):
     def put(self,request):
         active_user=self.get_object(request.data.get('username'))
         if active_user==None:
+            print("inisde if")
             active_serializer=ActiveLoginSerializer(data=request.data)
             if active_serializer.is_valid(raise_exception=True):
                 active_serializer.save()
+                print("save successfully")
                 return Response({"massage":"activation successfully","status":status.HTTP_200_OK})
         else:
             

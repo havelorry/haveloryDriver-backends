@@ -40,7 +40,7 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
 class ActiveLoginSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
-        driver=activeLogin.objects.update_or_create(**validated_data)
+        driver=activeLogin.objects.create(**validated_data)
         driver.save()
         return driver
     
