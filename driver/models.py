@@ -11,11 +11,12 @@ class Driver(models.Model):
     #image=models.FileField(upload_to='static/')
     locations=models.TextField()
     age=models.IntegerField()
-    workers = models.IntegerField(max_length=2, default=1)
+    workers = models.IntegerField(default=1)
     username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole")
 
     def __str__(self):
         return '%s , %s'%(self.username,self.locations)
+
 class Ride(models.Model):
     customer_id=models.BigIntegerField()
     status=models.IntegerField()

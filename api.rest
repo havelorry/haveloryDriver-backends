@@ -3,6 +3,7 @@ GET http://have-drivers.herokuapp.com/driver/active_drivers?lat= 26.176670&lng=7
 
 
 
+Http
 
 
 
@@ -16,3 +17,19 @@ GET http://have-drivers.herokuapp.com/driver/active_drivers?lat= 26.176670&lng=7
 
 ###local
 GET http://localhost:8000/driver/active_drivers?lat= 26.176670&lng=78.008072 HTTP/1.1
+
+### fare calculation
+
+POST http://localhost:8000/driver/billing/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "origin":{
+        "latitude":"27.1767",
+        "longitude":"78.0081"
+    },
+    "destination":{
+        "latitude":"26.2183",
+        "longitude":"78.1828"
+    }
+}

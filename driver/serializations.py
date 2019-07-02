@@ -73,3 +73,43 @@ class RideSerializer(serializers.ModelSerializer):
         return instance
 
     
+
+
+class Location(object):
+    def __init__(self,  **kwargs):
+        for field in ('origin', 'destination'):
+            setattr(self,field,kwargs.get(field))
+
+
+
+
+
+
+class Coordinatefield(serializers.Field):
+     def to_representation(self, value):
+          return {
+              'latitude':value.latitude,
+              'longitude':value.longitude
+          }
+
+     def to_internal_value(self, data):
+          return {
+              'latitude':data['latitude'],
+              'longitude':data['longitude'],
+          }
+
+
+
+
+class LocationSerializer(serializers.Serializer):
+    origin = Coordinatefield(source="*")
+    destination = Coordinatefield(source="*")
+
+    def create(self, validated_data):
+        return Location(**validated_data)
+
+    def update(self, instance, validated_data):
+        for field, value in validated_data.items():
+            setattr(instance,field.value)
+        return instance
+        

@@ -6,9 +6,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Driver,activeLogin,AppSetting
+from .models import Driver,activeLogin,AppSetting,Ride
 from rest_framework import generics
 from .vincenty import vincenty_inverse
+from rest_framework.parsers import JSONParser
+from .serializations import RideSerializer
+from django.db.models import Q
 # Create your views here.
 
 class DriverPofile(APIView):
@@ -182,38 +185,49 @@ class ActiveDrivers(APIView):
 
 
 
-
 class RideCreationView(APIView):
-    pass
+    queryset = Ride.objects.all()
 
+    def get(self,request,format=None):        
+        return Response(data=queryset)
 
+    def post(self,request, format=None):
+        z = RideSerializer(data = request.data)
+        if z.is_valid():
+            return Response({'message':'Ride created succesfully','status':'ok'})
+        else:
+            return Response({'message':'Ride creation Error','status':False})    
 
-
-def calculate(request, incl=False):
-    basePrice = AppSetting.objects.get(name="BASE_PRICE").value
+    def put(self, request):
     
-    print(request.POST)
+        data = Ride.objects.get(
+            Q(customer_id=request.data.get('customer_id')),
+            Q(pk= request.data.get('id'))
+        )
 
-    if incl:
-        pass
-    else:
-        pass
+        if data is not None:    
+            sl = RideSerializer(instance = data, data=request.data ,partial=True)
+            if sl.is_valid():
+                sl.save()
+                return Response({'message','Ride updated'})
 
-class FareCalculation(APIView):
-    def get(sef ,request, format=None):
-        try:
-            includeDriverDistance = AppSetting.objects.get(name="INCLUDE_DRIVER_DISTANCE").value
-
-            if includeDriverDistance is 0:
-                calculate(request,incl=False)
-            else:
-                calculate(request,incl=True)
-
-        except :
-            print('Loading failed')
-            
+        return Response({'message':'Ride updation failed'})
 
 
+class RideHistory(APIView):
+    def get(self,request,format=None, by='customer'):
+        A = 'all'
+        D ='driver'
+        C = 'customer'
+        if by is C:
+             data = Ride.objects.filter(
+                    Q(customer_id=request.data.get('identifier'))
+                )
 
+             return Response(data)
 
+        if by is D:
+            data = Ride.objects.filter(
+                Q(driver_id=request.data.get('identifier'))
+            )
 
