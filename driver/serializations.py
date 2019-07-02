@@ -46,8 +46,8 @@ class ActiveLoginSerializer(serializers.ModelSerializer):
     
     def update(self,instance,validate_data):
         instance.active=validate_data.get('active',instance.active)
-        instance.latitude=validate_data.get('latitude',instance.latitude)
-        instance.longitude=validate_data.get('longitude',instance.longitude)
+        instance.location=validate_data.get('location',instance.location)
+        instance.status=validate_data.get('status',instance.status)
         
         instance.save()
         return instance
