@@ -216,6 +216,7 @@ class RideCreationView(APIView):
 
 class RideHistory(APIView):
     def get(self,request,format=None, by='customer'):
+        
         A = 'all'
         D ='driver'
         C = 'customer'
@@ -230,4 +231,6 @@ class RideHistory(APIView):
             data = Ride.objects.filter(
                 Q(driver_id=request.data.get('identifier'))
             )
+
+            return Response(data)
 
