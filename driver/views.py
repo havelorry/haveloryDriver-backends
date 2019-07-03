@@ -12,6 +12,9 @@ from .vincenty import vincenty_inverse
 from rest_framework.parsers import JSONParser
 from .serializations import RideSerializer
 from django.db.models import Q
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
+
 # Create your views here.
 
 class DriverPofile(APIView):
@@ -185,33 +188,45 @@ class ActiveDrivers(APIView):
 
 
 
-class RideCreationView(APIView):
-    queryset = Ride.objects.all()
+class GenericModel(object):
+    def __init__(self, *args,**kwargs):
+        for field in args:
+            setattr(self,field,kwargs[field])
 
-    def get(self,request,format=None):        
-        return Response(data=queryset)
+
+class RideCreationView(APIView):
+
+    def get(self,request,format=None):
+        
+        queryset = Ride.objects.all()
+        data = [ x.toJson() for x in list(queryset)]        
+        return JsonResponse(data, safe=False)
 
     def post(self,request, format=None):
         z = RideSerializer(data = request.data)
-        if z.is_valid():
+        
+        if Ride.objects.create(**request.data):
             return Response({'message':'Ride created succesfully','status':'ok'})
         else:
             return Response({'message':'Ride creation Error','status':False})    
 
     def put(self, request):
-    
-        data = Ride.objects.get(
-            Q(customer_id=request.data.get('customer_id')),
-            Q(pk= request.data.get('id'))
+        _id = request.data.get('id')
+        status = request.data.get('status')
+        ride = Ride.objects.filter(
+            Q(id= _id),
         )
 
-        if data is not None:    
-            sl = RideSerializer(instance = data, data=request.data ,partial=True)
-            if sl.is_valid():
-                sl.save()
-                return Response({'message','Ride updated'})
+        results = list(ride)
 
-        return Response({'message':'Ride updation failed'})
+        if len(results) ==1:
+            r = results[0]
+            r.status = status
+            print(r.save())
+            return JsonResponse({'message':'Ride updated successfully', 'status':True})
+        
+        return JsonResponse({'message':'updation failed', 'status':False})
+        
 
 
 class RideHistory(APIView):

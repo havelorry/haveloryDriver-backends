@@ -18,18 +18,39 @@ Http
 ###local
 GET http://localhost:8000/driver/active_drivers?lat= 26.176670&lng=78.008072 HTTP/1.1
 
+
+    
 ### fare calculation
 
-POST http://localhost:8000/driver/billing/ HTTP/1.1
+GET http://localhost:8000/driver/rides/ HTTP/1.1
+Content-Type: application/json
+
+### create ride
+
+POST http://localhost:8000/driver/rides/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "origin":{
-        "latitude":"27.1767",
-        "longitude":"78.0081"
-    },
-    "destination":{
-        "latitude":"26.2183",
-        "longitude":"78.1828"
-    }
+    "customer_id":3,
+    "status":1,
+    "dest_latitude":"22.7022",
+    "dest_longitude":"78.78002",
+    "origin_latitude":"22.2322",
+    "origin_longitude":"78.78332",
+    "origin_string":"53, Suresh Nagar",
+    "dest_string":"78, Bada",
+    "driver_id":3,
+    "fare":200
+}
+
+
+
+### create ride
+
+PUT  http://localhost:8000/driver/rides/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "id":2,
+    "status":2
 }

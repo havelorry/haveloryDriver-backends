@@ -58,10 +58,11 @@ class ActiveLoginSerializer(serializers.ModelSerializer):
     
 class RideSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Ride,
-        fields = '__all__'
+        model =Ride,
+        fields ='__all__'
 
     def create(self,validated_data):
+        print (validated_data)
         ride = Ride.objects.create(**validated_data)
         ride.save()
         return ride
