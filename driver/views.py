@@ -14,6 +14,7 @@ from .serializations import RideSerializer
 from django.db.models import Q
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
+from rest_framework.decorators import api_view
 
 # Create your views here.
 
@@ -230,22 +231,30 @@ class RideCreationView(APIView):
 
 
 class RideHistory(APIView):
-    def get(self,request,format=None, by='customer'):
+    def get(self,request,format=None):
         
         A = 'all'
         D ='driver'
         C = 'customer'
-        if by is C:
-             data = Ride.objects.filter(
-                    Q(customer_id=request.data.get('identifier'))
-                )
 
-             return Response(data)
+        print(request.GET['by'])
+        if not isinstance(int(request.GET['identifier']),int):
+            return JsonResponse({'message':'wrong format'}, status=400)
 
-        if by is D:
-            data = Ride.objects.filter(
-                Q(driver_id=request.data.get('identifier'))
-            )
+        if request.GET['by'] == D:
+            return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
+        else:
+            return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
 
-            return Response(data)
+        
+        return JsonResponse([], safe=False)
+
+
+@api_view(['GET'])
+def getEarnings(request):
+    earnings = Ride.get_driver_earnings(request.GET['driver'])
+    print(earnings)
+    return JsonResponse(earnings, safe=False)
+
+
 

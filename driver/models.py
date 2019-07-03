@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
-
+from django.db.models import Q
 AVAILABLE = 'available'
 BUSY = 'busy'
 
@@ -18,6 +18,22 @@ class Driver(models.Model):
     def __str__(self):
         return '%s , %s'%(self.username,self.locations)
 
+t = lambda x: dict({
+                1:'CREATED',
+                2:'ACCEPTED',
+                3:'DISPATCHED',
+                4:'CANCELLED',
+                5:'COMPLETED'
+            }).get(x)
+
+
+rev = lambda x: dict({
+    'CREATED'   :1,  
+    'ACCEPTED'  :2, 
+    'DISPATCHED':3,
+    'CANCELLED' :4,
+    'COMPLETED' :5
+}).get(x)
 
 class Ride(models.Model):
     customer_id=models.BigIntegerField()
@@ -34,23 +50,48 @@ class Ride(models.Model):
 
     def toJson(self):
 
-        t = lambda x: dict({
-                1:'CREATED',
-                2:'ACCEPTED',
-                3:'DISPATCHED',
-                4:'CANCELLED',
-                5:'COMPLETED'
-            }).get(x)
-
         dictionary = model_to_dict(self)
         d = {**dictionary,'status': t(
             float(
                 dictionary.get('status')
             )
         )}
-        return d    
+        return d
 
+    def __str__(self):
+            import json
+            return "{}".format(json.dumps(model_to_dict(self)))
 
+    @classmethod
+    def get_driver_rides(self,driver,flag):
+        return Ride.objects.filter(
+            Q(driver_id=rev(flag)),
+            Q(status=flag)
+        )
+
+    @classmethod
+    def get_customer_rides(self,customer):
+        return Ride.objects.filter(
+            Q(customer_id = customer)
+        )
+
+    @classmethod
+    def get_driver_earnings(self , driverId , Type=5):
+        rides = Ride.objects.filter(
+                Q(driver_id = driverId),
+                Q(status = Type)
+            )
+
+        summary = [ model_to_dict(x).get('fare') for x in rides]
+        total = sum(summary,0)
+
+        report = {
+            'summary':[ x.toJson() for x in list(rides)],
+            'total':total
+        }
+
+        return report
+        
 
 class activeLogin(models.Model):
     username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole",unique=True,)
