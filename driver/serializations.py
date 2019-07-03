@@ -40,14 +40,14 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
 class ActiveLoginSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
-        driver=activeLogin.objects.update_or_create(**validated_data)
+        driver=activeLogin.objects.create(**validated_data)
         driver.save()
         return driver
     
     def update(self,instance,validate_data):
         instance.active=validate_data.get('active',instance.active)
-        instance.latitude=validate_data.get('latitude',instance.latitude)
-        instance.longitude=validate_data.get('longitude',instance.longitude)
+        instance.location=validate_data.get('location',instance.location)
+        instance.status=validate_data.get('status',instance.status)
         
         instance.save()
         return instance

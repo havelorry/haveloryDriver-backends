@@ -55,6 +55,7 @@ class DriverPofile(APIView):
             serializer.data['address']=detail_serilaizer['address']
             print (serializer.data)
             return Response({"username":detail_serilaizer.data['username'],"email":serializer.data['email'],"first_name":serializer.data['first_name'],"last_name":serializer.data['last_name'],"address":detail_serilaizer.data['address'],"mobile":detail_serilaizer.data['mobile'],"vehicle_number":detail_serilaizer.data['vehicle_number'],"locations":detail_serilaizer.data['locations'],"age":detail_serilaizer.data['age']})    
+   
     def put(self,request,format=None):
         user_detail=User.objects.get(username=request.data.get('username'))
         update_serializer=ProfileSerializer(instance=user_detail,data=request.data,partial=True)
@@ -99,6 +100,11 @@ class Login(APIView):
     #def get(self,request,format=None):
 
 class ActiveLogin(APIView):
+    def get_object(self, username):
+        try:
+            return activeLogin.objects.get(username=username)
+        except activeLogin.DoesNotExist:
+           raise_exception=True 
     def post(self,request,format=None):
         print ("inside post method")
         active_serializer=ActiveLoginSerializer(data=request.data)
@@ -109,12 +115,27 @@ class ActiveLogin(APIView):
             return Response({"massage":"activatiion failed"})    
 
     def put(self,request):
-        active_user=activeLogin.objects.get(username=request.data.get('username'))
-        active_login_serializer=ActiveLoginSerializer(instance=active_user,data=request.data,partial=True)    
-        if active_login_serializer.is_valid(raise_exception=True):
-            active_login_serializer.save()
-            return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
-        return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})    
+        active_user=self.get_object(request.data.get('username'))
+        if active_user==None:
+            print("inisde if")
+            active_serializer=ActiveLoginSerializer(data=request.data)
+            if active_serializer.is_valid(raise_exception=True):
+                active_serializer.save()
+                print("save successfully")
+                return Response({"massage":"activation successfully","status":status.HTTP_200_OK})
+        else:
+            
+            active_login_serializer=ActiveLoginSerializer(instance=active_user,data=request.data,partial=True)    
+            if active_login_serializer.is_valid(raise_exception=True):
+                active_login_serializer.save()
+                return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
+        return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})
+        # active_user=activeLogin.objects.get(username=request.data.get('username'))
+        # active_login_serializer=ActiveLoginSerializer(instance=active_user,data=request.data,partial=True)    
+        # if active_login_serializer.is_valid(raise_exception=True):
+        #     active_login_serializer.save()
+        #     return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
+        # return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})    
     
 def cvt(loc):
     import json
