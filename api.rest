@@ -58,6 +58,6 @@ Content-Type: application/json
 ### Get driver earnings
 GET http://localhost:8000/driver/earnings/?driver=3 HTTP/1.1
 
-
+4
 ### ride details
 GET http://localhost:8000/driver/history/?identifier=3&by=customer HTTP/1.1
