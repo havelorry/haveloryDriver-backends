@@ -252,10 +252,15 @@ class RideCreationView(APIView):
 
 def add_driver(obj):
     driver = Driver.objects.get( id=obj.get('driver_id'))
-    return {
-        **obj,
-        'driver':model_to_dict(driver)
+    if (driver==None):
+         **obj,
+        'driver':'Not found'
     }
+    else:
+        return {
+            **obj,
+            'driver':model_to_dict(driver)
+        }
 
 class RideHistory(APIView):
     def get(self,request,format=None):
