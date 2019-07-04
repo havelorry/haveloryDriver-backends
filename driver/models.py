@@ -45,12 +45,12 @@ class Ride(models.Model):
     origin_string=models.CharField(max_length=100)
     dest_string=models.CharField(max_length=100)    
     fare = models.FloatField(max_length=5,default=0.0)
-    driver_id=models.IntegerField()
+    driver_id=models.IntegerField(default=3)
     
 
     def toJson(self):
 
-        dictionary = model_to_dict(self)
+        dictionary = model_to_dict(self) 
         d = {**dictionary,'status': t(
             float(
                 dictionary.get('status')

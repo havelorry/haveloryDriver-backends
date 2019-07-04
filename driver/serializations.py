@@ -57,9 +57,7 @@ class ActiveLoginSerializer(serializers.ModelSerializer):
 #class DriverDetailSerializer(serializers.ModelSerializer):
     
 class RideSerializer(serializers.ModelSerializer):
-    class Meta:
-        model =Ride,
-        fields ='__all__'
+    
 
     def create(self,validated_data):
         print (validated_data)
@@ -73,7 +71,9 @@ class RideSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    
+    class Meta:
+        model =Ride
+        fields ='__all__'
 
 
 class Location(object):
@@ -113,4 +113,8 @@ class LocationSerializer(serializers.Serializer):
         for field, value in validated_data.items():
             setattr(instance,field.value)
         return instance
-        
+
+class RedeDetailSerializer(serializers.Serializer):
+    class Meta:
+        model =Ride
+        fields ='__all__'         

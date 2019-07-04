@@ -250,6 +250,12 @@ class RideCreationView(APIView):
         return JsonResponse({'message':'updation failed', 'status':False})
         
 
+def add_driver(obj):
+    driver = Driver.objects.get( id=obj.get('driver_id'))
+    return {
+        **obj,
+        'driver':model_to_dict(driver)
+    }
 
 class RideHistory(APIView):
     def get(self,request,format=None):
@@ -265,8 +271,7 @@ class RideHistory(APIView):
         if request.GET['by'] == D:
             return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
         else:
-            return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
-
+            return JsonResponse( [ add_driver(x.toJson())  for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
         
         return JsonResponse([], safe=False)
 
