@@ -253,6 +253,7 @@ class RideCreationView(APIView):
 def add_driver(obj):
     driver = Driver.objects.get( id=obj.get('driver_id'))
     if (driver==None):
+        return {
          **obj,
         'driver':'Not found'
     }
