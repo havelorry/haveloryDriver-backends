@@ -37,7 +37,7 @@ class DriverPofile(APIView):
             if profile_detail_serializer.is_valid(raise_exception=True):
                 
                 profile_detail_serializer.save()
-                return Response({"massage":"saved successfully"})
+                return Response({"massage":"saved successfully","details":profile_detail_serializer.data})
         return Response("done")
 
     def get(self,request,format=None):
@@ -51,10 +51,13 @@ class DriverPofile(APIView):
             username1=Driver.objects.get(username=username)
             print(username1)
             detail_serilaizer=ProfileDetailSerializer(username1)
+            print(detail_serilaizer.data['id'])
             serializer=ProfileSerializer(user)
             serializer.data['address']=detail_serilaizer['address']
+            #serializer.data['id']=detail_serilaizer.data['id']
+
             print (serializer.data)
-            return Response({"username":detail_serilaizer.data['username'],"email":serializer.data['email'],"first_name":serializer.data['first_name'],"last_name":serializer.data['last_name'],"address":detail_serilaizer.data['address'],"mobile":detail_serilaizer.data['mobile'],"vehicle_number":detail_serilaizer.data['vehicle_number'],"locations":detail_serilaizer.data['locations'],"age":detail_serilaizer.data['age']})    
+            return Response({"id":detail_serilaizer.data['id'],"username":detail_serilaizer.data['username'],"email":serializer.data['email'],"first_name":serializer.data['first_name'],"last_name":serializer.data['last_name'],"address":detail_serilaizer.data['address'],"mobile":detail_serilaizer.data['mobile'],"vehicle_number":detail_serilaizer.data['vehicle_number'],"locations":detail_serilaizer.data['locations'],"age":detail_serilaizer.data['age']})    
    
     def put(self,request,format=None):
         user_detail=User.objects.get(username=request.data.get('username'))
@@ -90,13 +93,17 @@ class Login(APIView):
             return Response({'error': 'Please provide both username and password'},
                             status=status.HTTP_400_BAD_REQUEST)
         user = authenticate(username=username, password=password)
+
         print(user)
+
         if not user:
             return Response({'error': 'Invalid Credentials'},
                             status=status.HTTP_404_NOT_FOUND)
-        token, _ = Token.objects.get_or_create(user=user)
-       
-        return Response({"massage":"Login Successfully","token":token.key})
+        else:
+            token, _ = Token.objects.get_or_create(user=user)
+            driver=Driver.objects.get(username=user)
+            print(driver.id)
+            return Response({"massage":"Login Successfully","token":token.key,"driverId":driver.id})
     #def get(self,request,format=None):
 
 class ActiveLogin(APIView):
@@ -252,17 +259,10 @@ class RideCreationView(APIView):
 
 def add_driver(obj):
     driver = Driver.objects.get( id=obj.get('driver_id'))
-    print(driver)
-    if (driver==None):
-        return {
-         **obj,
-        'driver':'Not found'
+    return {
+        **obj,
+        'driver':model_to_dict(driver)
     }
-    else:
-        return {
-            **obj,
-            'driver':model_to_dict(driver)
-        }
 
 class RideHistory(APIView):
     def get(self,request,format=None):
@@ -278,7 +278,7 @@ class RideHistory(APIView):
         if request.GET['by'] == D:
             return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
         else:
-            return JsonResponse( [ x.toJson()  for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
+            return JsonResponse( [ add_driver(x.toJson())  for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
         
         return JsonResponse([], safe=False)
 
