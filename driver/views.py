@@ -252,6 +252,7 @@ class RideCreationView(APIView):
 
 def add_driver(obj):
     driver = Driver.objects.get( id=obj.get('driver_id'))
+    print(driver)
     if (driver==None):
         return {
          **obj,
@@ -277,7 +278,7 @@ class RideHistory(APIView):
         if request.GET['by'] == D:
             return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
         else:
-            return JsonResponse( [ add_driver(x.toJson())  for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
+            return JsonResponse( [ x.toJson()  for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
         
         return JsonResponse([], safe=False)
 
