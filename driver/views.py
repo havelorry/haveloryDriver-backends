@@ -271,7 +271,7 @@ class RideHistory(APIView):
         if request.GET['by'] == D:
             return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
         else:
-            return JsonResponse( [ add_driver(x.toJson())  for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
+            return JsonResponse( [ add_driver(x.toJson())  for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
         
         return JsonResponse([], safe=False)
 
