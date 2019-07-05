@@ -15,7 +15,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view
-
+import requests
 # Create your views here.
 
 class DriverPofile(APIView):
@@ -278,6 +278,16 @@ def add_driver(obj):
         **obj,
         'driver':model_to_dict(driver)
     }
+def add_user(obj):
+    payload = {'id': obj.get('customer_id')}
+    r = requests.get('https://havelorryapp.herokuapp.com/api/customer/', params=payload)
+    print("Data=",r.text)
+
+    #driver = Driver.objects.get( id=obj.get('driver_id'))
+    return {
+        **obj,
+        'customer':r.text
+    }
 
 class RideHistory(APIView):
     def get(self,request,format=None):
@@ -291,7 +301,9 @@ class RideHistory(APIView):
             return JsonResponse({'message':'wrong format'}, status=400)
 
         if request.GET['by'] == D:
-            return JsonResponse( [ x.toJson() for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
+            print("if")
+            
+            return JsonResponse( [ add_user(x.toJson()) for x in list(Ride.objects.filter(Q(driver_id=request.GET['identifier'])))], safe=False)
         else:
             return JsonResponse( [ add_driver(x.toJson())  for x in list(Ride.objects.filter(Q(customer_id=request.GET['identifier'])))], safe=False)
         
