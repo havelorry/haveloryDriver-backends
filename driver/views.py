@@ -114,12 +114,27 @@ class ActiveLogin(APIView):
            raise_exception=True 
     def post(self,request,format=None):
         print ("inside post method")
-        active_serializer=ActiveLoginSerializer(data=request.data)
-        if active_serializer.is_valid(raise_exception=True):
-            active_serializer.save()
-            return Response({"massage":"activation successfully"})
+        active_user=self.get_object(request.data.get('username'))
+        if active_user==None:
+            print("inisde if")
+            active_serializer=ActiveLoginSerializer(data=request.data)
+            if active_serializer.is_valid(raise_exception=True):
+                active_serializer.save()
+                print("save successfully")
+                return Response({"massage":"activation successfully","status":status.HTTP_200_OK})
         else:
-            return Response({"massage":"activatiion failed"})    
+            
+            active_login_serializer=ActiveLoginSerializer(instance=active_user,data=request.data,partial=True)    
+            if active_login_serializer.is_valid(raise_exception=True):
+                active_login_serializer.save()
+                return Response({"massage":"Updation done successfully","status":status.HTTP_200_OK})
+        return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})
+        # active_serializer=ActiveLoginSerializer(data=request.data)
+        # if active_serializer.is_valid(raise_exception=True):
+        #     active_serializer.save()
+        #     return Response({"massage":"activation successfully"})
+        # else:
+        #     return Response({"massage":"activatiion failed"})    
 
     def put(self,request):
         active_user=self.get_object(request.data.get('username'))
