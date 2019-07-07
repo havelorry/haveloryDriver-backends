@@ -103,7 +103,7 @@ class Login(APIView):
             token, _ = Token.objects.get_or_create(user=user)
             driver=Driver.objects.get(username=user)
             print(driver.id)
-            return Response({"massage":"Login Successfully","token":token.key,"driverId":driver.id})
+            return Response({"massage":"Login Successfully","token":token.key," ":driver.id})
     #def get(self,request,format=None):
 
 class ActiveLogin(APIView):
@@ -273,7 +273,7 @@ class RideCreationView(APIView):
         
 
 def add_driver(obj):
-    driver = Driver.objects.get( id=obj.get('driver_id'))
+    driver = Driver.objects.get(username=obj.get('driver_id'))
     return {
         **obj,
         'driver':model_to_dict(driver)
