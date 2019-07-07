@@ -103,7 +103,7 @@ class Login(APIView):
             token, _ = Token.objects.get_or_create(user=user)
             driver=Driver.objects.get(username=user)
             print(driver.id)
-            return Response({"massage":"Login Successfully","token":token.key," ":driver.id})
+            return Response({"massage":"Login Successfully","token":token.key,"driverId":driver.id})
     #def get(self,request,format=None):
 
 class ActiveLogin(APIView):
