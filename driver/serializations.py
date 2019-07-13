@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Driver,activeLogin, Ride
+from .models import Driver,activeLogin, Ride, Notification
 from django.contrib.auth.models import User
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -118,3 +118,22 @@ class RedeDetailSerializer(serializers.Serializer):
     class Meta:
         model =Ride
         fields ='__all__'         
+
+
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    def create(self,validated_data):
+       # print ('serializer=',**validated_data)
+        notification_done = Notification.objects.create(**validated_data)
+        notification_done.save()
+        return notification_done
+
+    def update(self,instance,validated_data):
+        instance.token = validated_data.get('token', instance.token)
+        instance.save()
+        return instance 
+
+    class Meta:
+        model=Notification
+        fields='__all__'

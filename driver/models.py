@@ -112,3 +112,11 @@ class AppSetting(models.Model):
     def __str__(self):
         return "%s %d"%(self.name,self.value)
         
+
+
+class Notification(models.Model):
+    token=models.CharField(max_length=100)
+    username=models.CharField(max_length=100)
+    identification=models.CharField(max_length=100)
+    def __str__(self):
+        return "%s %s"%(self.username ,self.token)

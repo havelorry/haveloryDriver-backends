@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializations import ProfileDetailSerializer,ProfileSerializer,ActiveLoginSerializer
+from .serializations import ProfileDetailSerializer,ProfileSerializer,ActiveLoginSerializer,NotificationSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import Driver,activeLogin,AppSetting,Ride
+from .models import Driver,activeLogin,AppSetting,Ride,Notification
 from rest_framework import generics
 from .vincenty import vincenty_inverse
 from rest_framework.parsers import JSONParser
@@ -17,6 +17,60 @@ from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view
 import requests
 # Create your views here.
+
+from exponent_server_sdk import DeviceNotRegisteredError
+from exponent_server_sdk import PushClient
+from exponent_server_sdk import PushMessage
+from exponent_server_sdk import PushResponseError
+from exponent_server_sdk import PushServerError
+from requests.exceptions import ConnectionError
+from requests.exceptions import HTTPError
+
+
+def send_push_message(token, message, extra=None):
+    try:
+        response = PushClient().publish(
+            PushMessage(to=token,
+                        body=message,
+                        data=extra))
+    except PushServerError as exc:
+        # Encountered some likely formatting/validation error.
+        rollbar.report_exc_info(
+            extra_data={
+                'token': token,
+                'message': message,
+                'extra': extra,
+                'errors': exc.errors,
+                'response_data': exc.response_data,
+            })
+        raise
+    except (ConnectionError, HTTPError) as exc:
+        # Encountered some Connection or HTTP error - retry a few times in
+        # case it is transient.
+        rollbar.report_exc_info(
+            extra_data={'token': token, 'message': message, 'extra': extra})
+        raise self.retry(exc=exc)
+
+    try:
+        # We got a response back, but we don't know whether it's an error yet.
+        # This call raises errors so we can handle them with normal exception
+        # flows.
+        response.validate_response()
+    except DeviceNotRegisteredError:
+        # Mark the push token as inactive
+        from notifications.models import PushToken
+        PushToken.objects.filter(token=token).update(active=False)
+    except PushResponseError as exc:
+        # Encountered some other per-notification error.
+        rollbar.report_exc_info(
+            extra_data={
+                'token': token,
+                'message': message,
+                'extra': extra,
+                'push_response': exc.push_response._asdict(),
+            })
+        raise self.retry(exc=exc)
+
 
 class DriverPofile(APIView):
     def get_object(self, username):
@@ -318,3 +372,28 @@ def getEarnings(request):
 
 
 
+class NotificationView(APIView):
+    def get_object(self, username):
+        try:
+            return Notification.objects.get(username=username)
+        except Notification.DoesNotExist:
+           raise_exception=True 
+    def post(self,request,format=None):
+        print ("inside post method",request.data.get('username'))
+        active_user=self.get_object(request.data.get('username'))
+        print(active_user)
+        if active_user==None:
+            print("inisde if",request.data)
+            serializer=NotificationSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                print("save successfully")
+                return Response({"massage":"Token saved successfully","status":status.HTTP_200_OK})
+        else:
+            
+            serializer=NotificationSerializer(instance=active_user,data=request.data,partial=True)    
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response({"massage":" Token Updation done successfully","status":status.HTTP_200_OK})
+        return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})
+     
