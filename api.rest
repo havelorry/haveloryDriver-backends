@@ -3,17 +3,6 @@ GET http://have-drivers.herokuapp.com/driver/active_drivers?lat= 26.176670&lng=7
 
 
 
-Http
-
-
-
-
-
-
-
-
-
-
 
 ###local
 GET http://localhost:8000/driver/active_drivers?lat= 26.176670&lng=78.008072 HTTP/1.1
@@ -27,19 +16,19 @@ Content-Type: application/json
 
 ### create ride
 
-POST http://localhost:8000/driver/rides/ HTTP/1.1
+POST http://have-drivers.herokuapp.com/driver/rides/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "customer_id":2,
+    "customer_id":9634824810,
     "status":3,
-    "dest_latitude":"22.7022",
+    "dest_latitude":"27.7022",
     "dest_longitude":"78.78002",
     "origin_latitude":"22.2322",
     "origin_longitude":"78.78332",
     "origin_string":"56, Suresh Nagar",
     "dest_string":"78, New Colony",
-    "driver_id":3,
+    "driver_id":9713668753,
     "fare":250
 }
 

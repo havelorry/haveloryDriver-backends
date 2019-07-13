@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'channels',
+    'channels',
     'driver',
     'rest_framework',
     'rest_framework.authtoken'
@@ -70,6 +70,16 @@ TEMPLATES = [
         },
     },
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": ['redis://localhost:6379'],
+        },
+    },
+}
+
 
 WSGI_APPLICATION = 'bhole.wsgi.application'
 ASGI_APPLICATION = "bhole.routing.application"
