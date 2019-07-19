@@ -3,6 +3,16 @@ GET http://have-drivers.herokuapp.com/driver/active_drivers?lat= 26.176670&lng=7
 
 
 
+### send local request
+
+POST http://b7d56b0e.ngrok.io/driver/login/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "username":9634824810,
+    "password":"ankii()6600"
+}
+
 
 ###local
 GET http://localhost:8000/driver/active_drivers?lat= 26.176670&lng=78.008072 HTTP/1.1

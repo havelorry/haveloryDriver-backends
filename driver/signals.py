@@ -7,6 +7,16 @@ import json
 from asgiref.sync import async_to_sync
 from driver.views import send_push_message
 
+
+rev = lambda x: dict({
+    1:'CREATED'   ,  
+    2:'ACCEPTED'  , 
+    3:'DISPATCHED',
+    4:'CANCELLED' ,
+    5:'COMPLETED' 
+}).get(x)
+
+
 @receiver(post_save, sender=activeLogin)
 def announce_user(instance,**kwargs):
     channel_layer = get_channel_layer()
@@ -24,17 +34,19 @@ def announce_user(instance,**kwargs):
 
 @receiver(post_save,sender=Ride)
 def announce_rider(instance,**kwargs):
-    userId = instance.username_id
+    print(instance)
+    userId = instance.customer_id
     driver_id = instance.driver_id
-
+    rideStat = rev(instance.status)
     userTResult = Notification.objects.get(username=userId)
-    driverTResult = Notification.objects.get(username=driver_id)
+    #driverTResult = Notification.objects.get(username=driver_id)
 
     if userTResult is not None:
-        send_push_message(userTResult.token,"{} ride is {}".format(userId,instance.status))
+        print(rideStat)
+        send_push_message(userTResult.token,"{} ride is {} with id {}".format(userId,rideStat,instance.id))
 
-    if driverTResult is not None:
-        send_push_message(driverTResult.token,"{} a ride has been assigned to You see in details".format(instance.driver_id))
+    #if driverTResult is not None:
+     #   send_push_message(driverTResult.token,"{} a ride has been assigned to You see in details".format(instance.driver_id))
 
 
 

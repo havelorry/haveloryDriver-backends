@@ -6,8 +6,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
         user=User.objects.create(**validated_data)
         user.save()
-        user.set_password(validated_data['password'])
-        user.save()
+        
         return user
     def update(self,instance,validate_data):
         instance.first_name=validate_data.get('first_name',instance.first_name)

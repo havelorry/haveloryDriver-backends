@@ -226,6 +226,7 @@ def cvt(loc):
 
 def level_1(loc,coords):
     import json
+    from geopy.distance import great_circle 
     _coords = json.loads(loc.get('location'))
     _flt_x = float(
         _coords.get('x')
@@ -244,13 +245,9 @@ def level_1(loc,coords):
         coords[1]
     )    
 
-    _distance = vincenty_inverse([
-        _flt2_x,
-        _flt2_y
-    ],[
-       _flt_x,
-       _flt_y 
-    ])
+    _distance = great_circle(
+        (_flt_x,_flt_y),(_flt2_x,_flt2_y)
+    )
 
     return {
         **loc,
