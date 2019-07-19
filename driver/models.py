@@ -46,7 +46,8 @@ class Ride(models.Model):
     dest_string=models.CharField(max_length=100)    
     fare = models.FloatField(max_length=5,default=0.0)
     driver_id=models.IntegerField(default=3)
-    
+    is_scheduled = models.BooleanField(default=False)
+    extra = models.CharField(max_length=245,default="NULL")    
 
     def toJson(self):
 
