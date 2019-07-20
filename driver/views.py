@@ -35,7 +35,7 @@ def send_push_message(token, message, extra=None):
                         data=extra))
     except PushServerError as exc:
         # Encountered some likely formatting/validation error.
-        rollbar.report_exc_info(
+        """rollbar.report_exc_info(
             extra_data={
                 'token': token,
                 'message': message,
@@ -43,13 +43,16 @@ def send_push_message(token, message, extra=None):
                 'errors': exc.errors,
                 'response_data': exc.response_data,
             })
+        
+        """
         raise
     except (ConnectionError, HTTPError) as exc:
         # Encountered some Connection or HTTP error - retry a few times in
         # case it is transient.
-        rollbar.report_exc_info(
-            extra_data={'token': token, 'message': message, 'extra': extra})
-        raise self.retry(exc=exc)
+        #rollbar.report_exc_info(
+        #    extra_data={'token': token, 'message': message, 'extra': extra})
+        #raise self.retry(exc=exc)
+        pass
 
     try:
         # We got a response back, but we don't know whether it's an error yet.
@@ -58,10 +61,14 @@ def send_push_message(token, message, extra=None):
         response.validate_response()
     except DeviceNotRegisteredError:
         # Mark the push token as inactive
-        from notifications.models import PushToken
-        PushToken.objects.filter(token=token).update(active=False)
+        #from driver.models import PushToken
+        #PushToken.objects.filter(token=token).update(active=False)
+        print("Device Not registered")
+        
     except PushResponseError as exc:
         # Encountered some other per-notification error.
+        pass
+        """
         rollbar.report_exc_info(
             extra_data={
                 'token': token,
@@ -70,6 +77,8 @@ def send_push_message(token, message, extra=None):
                 'push_response': exc.push_response._asdict(),
             })
         raise self.retry(exc=exc)
+        """
+
 
 
 class DriverPofile(APIView):
