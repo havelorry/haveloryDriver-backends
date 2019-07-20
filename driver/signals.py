@@ -39,14 +39,14 @@ def announce_rider(instance,**kwargs):
     driver_id = instance.driver_id
     rideStat = rev(instance.status)
     userTResult = Notification.objects.get(username=userId)
-    #driverTResult = Notification.objects.get(username=driver_id)
+    driverTResult = Notification.objects.get(username=driver_id)
 
     if userTResult is not None:
         print(rideStat)
         send_push_message(userTResult.token,"{} ride is {} with id {}".format(userId,rideStat,instance.id))
 
-    #if driverTResult is not None:
-     #   send_push_message(driverTResult.token,"{} a ride has been assigned to You see in details".format(instance.driver_id))
+    if driverTResult is not None:
+        send_push_message(driverTResult.token,"{} a ride has been assigned to You see in details".format(instance.driver_id))
 
 
 
