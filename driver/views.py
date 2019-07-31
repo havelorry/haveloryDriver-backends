@@ -89,13 +89,13 @@ class DriverPofile(APIView):
            raise_exception=True 
     def post(self,request,format=None):
         print ("inside post method")
-        profile_serializer=ProfileSerializer(data=request.data)
+        profile_serializer=ProfileSerializer(data=request.data,partial=True)
         if profile_serializer.is_valid(raise_exception=True):
             user=profile_serializer.save()
             if user:
                 token = Token.objects.create(user=user)
                 print("token created",token)
-            profile_detail_serializer=ProfileDetailSerializer(data=request.data)
+            profile_detail_serializer=ProfileDetailSerializer(data=request.data,partial=True)
             
             if profile_detail_serializer.is_valid(raise_exception=True):
                 
