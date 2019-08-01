@@ -28,29 +28,15 @@
                     var loc=$("#loc").val();
                     var age=$("#age").val();
                     var add=$("#add").val();
-                    $.post('https://have-drivers.herokuapp.com/driver/profile/',
-                            {'username':uname,
-                            'password':pass,
-                            'first_name':dname,
-                            'mobile':mob,
-                            'vehicle_number':vnum,
-                            'workers':workers,
-                            'locations':loc,
-                            'age':age,
-                            'address':add},
-                            function(data,status){
-                                alert("Data: " + data + "\nStatus: " + status);
-
-                            });
-                   /* $.ajax({
+                    alert("Ho gya")
+                    $.ajax({
                         type:'POST',
                         url:'https://have-drivers.herokuapp.com/driver/profile/',
+                        contentType:'application/json',
                         dataType: "jsonp",
-                        headers:{
-                           'Content-Type':'application/json;charset=utf-8',
-                        },
+                        crossDomain: true,
                         //data:{username:uname,password:pass,first_name:fname,last_name:lname,email:email,address:add,vehicle_number:vnum,locations:loc,age:age,mobile:mob}
-                        body: JSON.stringify({
+                        data: {
                             'username':uname,
                             'password':pass,
                             'first_name':dname,
@@ -60,14 +46,14 @@
                             'locations':loc,
                             'age':age,
                             'address':add
-                    }),
+                    },
                     success: function(msg){
-                        console.log(msg);
+                        console.log("success"+msg);
                     },
                     error:function(xhr){
                         console.log("error"+xhr);
                     }
-                    });*/
+                    });
                 });
             </script>
     </body>
