@@ -6,3 +6,4 @@ pytz==2019.1
 six==1.12.0
 sqlparse==0.3.0
 requests
+django-cors-headers==2.5.3
