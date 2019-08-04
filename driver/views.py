@@ -16,6 +16,8 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view
 import requests
+from rest_framework import viewsets
+
 # Create your views here.
 
 class DriverPofile(APIView):
@@ -316,5 +318,12 @@ def getEarnings(request):
     print(earnings)
     return JsonResponse(earnings, safe=False)
 
-
-
+class UserViewSet(viewsets.ViewSet):
+    """
+    A simple ViewSet for listing or retrieving users.
+    """
+    def list(self, request):
+        queryset = User.objects.filter(is_superuser=False)
+        print(queryset)
+        serializer = ProfileSerializer(queryset, many=True)
+        return Response(serializer.data)
