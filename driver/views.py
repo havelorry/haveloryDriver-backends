@@ -16,6 +16,8 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view
 import requests
+from rest_framework import viewsets
+
 # Create your views here.
 
 from exponent_server_sdk import DeviceNotRegisteredError
@@ -403,3 +405,12 @@ class NotificationView(APIView):
                 return Response({"massage":" Token Updation done successfully","status":status.HTTP_200_OK})
         return Response({'massage':"Some thing went wrong","status":status.HTTP_400_BAD_REQUEST})
      
+class UserViewSet(viewsets.ViewSet):
+    """
+    A simple ViewSet for listing or retrieving users.
+    """
+    def list(self, request):
+        queryset = User.objects.filter(is_superuser=False)
+        print(queryset)
+        serializer = ProfileSerializer(queryset, many=True)
+        return Response(serializer.data)
