@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <title>Test API</title>
+        <script src="jquery.min.js"></script>
+    </head>
+    <body>
+        <table>
+            <tr><td>Username</td><td><input id="uname" type="text"></td></tr>
+            <tr><td>Password</td><td><input id="pass" type="password"></td></tr>
+            <tr><td>Driver Name</td><td><input id="dname" type="text"></td></tr>
+            <tr><td>Mobile</td><td><input id="mob" type="number"></td></tr>
+            <tr><td>Vehicle No.</td><td><input id="vnum" type="number"></td></tr>
+            <tr><td>Workers</td><td><input id="workers" type="number"></td></tr>
+            <tr><td>Location</td><td><input id="loc" type="text"></td></tr>
+            <tr><td>Age</td><td><input id="age" type="number"></td></tr>
+            <tr><td>Address</td><td><input id="add" type="text"></td></tr>
+
+        </table>
+        <button id="reg">Register</button>
+        <script>
+                $("#reg").click(function(){
+                    var uname=$("#uname").val();
+                    var pass=$("#pass").val();
+                    var dname=$("#dname").val();
+                    var mob=$("#mob").val();
+                    var vnum=$("#vnum").val();
+                    var workers=$("workers").val();
+                    var loc=$("#loc").val();
+                    var age=$("#age").val();
+                    var add=$("#add").val();
+                    $.post('https://have-drivers.herokuapp.com/driver/profile/',
+                            {'username':uname,
+                            'password':pass,
+                            'first_name':dname,
+                            'mobile':mob,
+                            'vehicle_number':vnum,
+                            'workers':workers,
+                            'locations':loc,
+                            'age':age,
+                            'address':add},
+                            function(data,status){
+                                console.log("Data: " + data + "\nStatus: " + status);
+
+                            });
+                   /* $.ajax({
+                        type:'POST',
+                        url:'https://have-drivers.herokuapp.com/driver/profile/',
+                        dataType: "jsonp",
+                        headers:{
+                           'Content-Type':'application/json;charset=utf-8',
+                        },
+                        //data:{username:uname,password:pass,first_name:fname,last_name:lname,email:email,address:add,vehicle_number:vnum,locations:loc,age:age,mobile:mob}
+                        body: JSON.stringify({
+                            'username':uname,
+                            'password':pass,
+                            'first_name':dname,
+                            'mobile':mob,
+                            'vehicle_number':vnum,
+                            'workers':workers,
+                            'locations':loc,
+                            'age':age,
+                            'address':add
+                    }),
+                    success: function(msg){
+                        console.log(msg);
+                    },
+                    error:function(xhr){
+                        console.log("error"+xhr);
+                    }
+                    });*/
+                });
+            </script>
+    </body>
+
+</html>
