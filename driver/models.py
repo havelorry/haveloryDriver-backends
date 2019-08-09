@@ -11,6 +11,7 @@ class Driver(models.Model):
     vehicle_number=models.BigIntegerField()
     #image=models.FileField(upload_to='static/')
     locations=models.TextField()
+    profilePic = models.CharField(max_length=255,default="")
     age=models.IntegerField()
     workers = models.IntegerField(default=1)
     username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole")

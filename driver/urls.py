@@ -1,8 +1,18 @@
 #from .views import Drivers
 from django.urls import path
+from django.conf.urls.static import static
 from rest_framework.urlpatterns import format_suffix_patterns
-from .views import (DriverPofile,Login,ActiveLogin,ActiveDrivers, RideCreationView, getEarnings,RideHistory, NotificationView)
-from .views import (DriverPofile,Login,ActiveLogin,ActiveDrivers, RideCreationView, getEarnings,RideHistory,UserViewSet)
+
+from .views import (
+    DriverPofile,
+    Login,
+    ActiveLogin,ActiveDrivers,
+    RideCreationView, getEarnings,
+    RideHistory, NotificationView,
+    UserViewSet,
+    UpdateProfilePicView
+    )
+
 
 urlpatterns=[
     path('profile/',DriverPofile.as_view()),
@@ -13,8 +23,8 @@ urlpatterns=[
     path('earnings/',getEarnings),
     path('history/',RideHistory.as_view()),
     path('alerts/',NotificationView.as_view()),
-    path('alldriver/',UserViewSet.as_view({'get': 'list'}))
-
-
+    path('alldriver/',UserViewSet.as_view({'get': 'list'})),
+    path('image/',UpdateProfilePicView.as_view())
 ]
+
 urlpatterns = format_suffix_patterns(urlpatterns)

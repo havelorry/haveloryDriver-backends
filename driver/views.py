@@ -122,7 +122,7 @@ class DriverPofile(APIView):
             #serializer.data['id']=detail_serilaizer.data['id']
 
             print (serializer.data)
-            return Response({"id":detail_serilaizer.data['id'],"username":detail_serilaizer.data['username'],"email":serializer.data['email'],"first_name":serializer.data['first_name'],"last_name":serializer.data['last_name'],"address":detail_serilaizer.data['address'],"mobile":detail_serilaizer.data['mobile'],"vehicle_number":detail_serilaizer.data['vehicle_number'],"locations":detail_serilaizer.data['locations'],"age":detail_serilaizer.data['age']})    
+            return Response({"id":detail_serilaizer.data['id'],"username":detail_serilaizer.data['username'],"email":serializer.data['email'],"first_name":serializer.data['first_name'],"last_name":serializer.data['last_name'],"address":detail_serilaizer.data['address'],"mobile":detail_serilaizer.data['mobile'],"vehicle_number":detail_serilaizer.data['vehicle_number'],"locations":detail_serilaizer.data['locations'],"age":detail_serilaizer.data['age'],"profilePic":detail_serilaizer.data['profilePic']})    
    
     def put(self,request,format=None):
         user_detail=User.objects.get(username=request.data.get('username'))
@@ -290,9 +290,7 @@ class ActiveDrivers(APIView):
         return JsonResponse(
             dk,
             safe=False
-        )    
-
-
+        )
 
 class GenericModel(object):
     def __init__(self, *args,**kwargs):
@@ -414,3 +412,29 @@ class UserViewSet(viewsets.ViewSet):
         print(queryset)
         serializer = ProfileSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+
+class UpdateProfilePicView(APIView):
+    from rest_framework.parsers import MultiPartParser,JSONParser
+    parser_classes = (
+        JSONParser,
+        MultiPartParser,
+    )
+
+    def put(self, request, format=None):
+        from django.core.files.storage import FileSystemStorage
+        driver = Driver.objects.get(username=request.data.get('username'))
+        file_obj = request.FILES['file']
+        fs = FileSystemStorage()
+        filename = fs.save(f'profiles/{file_obj.name}',file_obj)
+        setattr(driver,'profilePic',filename)
+        driver.save()
+
+        return Response({
+            'status':'ok',
+            'file_url':fs.url(filename)
+        })
+
+
+

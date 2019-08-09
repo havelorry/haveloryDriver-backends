@@ -10,8 +10,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         return user
     def update(self,instance,validate_data):
         instance.first_name=validate_data.get('first_name',instance.first_name)
-        #instance.last_name=validate_data.get('last_name',instance.last_name)
-        #instance.email=validate_data.get('email',instance.email)
+        instance.last_name=validate_data.get('last_name',instance.last_name)
+        instance.email=validate_data.get('email',instance.email)
         instance.save()
         return instance
     class Meta:
@@ -24,6 +24,8 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
         driver=Driver.objects.create(**validated_data)
         driver.save()
         return driver
+    
+    
     def update(self,instance,validate_data):
         instance.address=validate_data.get('address',instance.address)
         instance.mobile=validate_data.get('mobile',instance.mobile)
@@ -33,6 +35,7 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
         
         instance.save()
         return instance
+    
     class Meta:
         model=Driver
         fields='__all__'            
