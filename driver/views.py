@@ -169,6 +169,33 @@ class Login(APIView):
             driver=Driver.objects.get(username=user)
             print(driver.id)
             return Response({"massage":"Login Successfully","token":token.key,"driverId":driver.id})
+
+class AdminLogin(APIView):
+    def post(self,request,format=None):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        print (username)
+        print(password)
+        if username is None or password is None:
+            return Response({'error': 'Please provide both username and password'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(username=username, password=password)
+
+        print(user)
+        
+        if not user:
+            return Response({'error': 'Invalid Credentials'},
+                            status=status.HTTP_404_NOT_FOUND)
+        else:
+            admin=User.objects.get(username=user)
+            print(admin.is_superuser)
+            if admin.is_superuser==True:
+                token, _ = Token.objects.get_or_create(user=user)
+                return Response({"massage":" Admin Login Successfully","token":token.key},status=status.HTTP_200_OK)
+            else:
+                return Response({"massage":"Login Failed This is not superuser"},status=status.HTTP_404_NOT_FOUND)
+                       
+    
     #def get(self,request,format=None):
 
 class ActiveLogin(APIView):
