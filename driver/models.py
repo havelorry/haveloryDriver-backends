@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 from django.forms.models import model_to_dict
 from django.db.models import Q
 AVAILABLE = 'available'
@@ -49,7 +50,7 @@ class Ride(models.Model):
     driver_id=models.IntegerField(default=3)
     is_scheduled = models.BooleanField(default=False)
     extra = models.CharField(max_length=245,default="NULL")    
-
+    date = models.DateField(default=datetime.date.today)
     def toJson(self):
 
         dictionary = model_to_dict(self) 
@@ -61,8 +62,7 @@ class Ride(models.Model):
         return d
 
     def __str__(self):
-            import json
-            return "{}".format(json.dumps(model_to_dict(self)))
+        return '%s , %s'%(self.customer_id,self.status)
 
     @classmethod
     def get_driver_rides(self,driver,flag):

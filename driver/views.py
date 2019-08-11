@@ -15,7 +15,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view
-import requests
+import requests,datetime
 from rest_framework import viewsets
 
 # Create your views here.
@@ -27,7 +27,10 @@ from exponent_server_sdk import PushResponseError
 from exponent_server_sdk import PushServerError
 from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
-
+from datetime import date
+today = date.today()
+d1 = today.strftime("%Y-%m-%d")
+print("d1 =", d1)
 
 def send_push_message(token, message, extra=None):
     try:
@@ -463,5 +466,74 @@ class UpdateProfilePicView(APIView):
             'file_url':fs.url(filename)
         })
 
+class TotalDriver(APIView):
+    def get_active_driver(self):
+        try:
+            return activeLogin.objects.all().count()
+        except activeLogin.DoesNotExist:
+           raise_exception=True 
+    def get_all_driver(self):
+            try:
+                return Driver.objects.all().count()
+            except Driver.DoesNotExist:
+               raise_exception=True        
+    def get(self,request,format=None):
+        total_driver=self.get_all_driver()
+        active_driver=self.get_active_driver()
+        
+        return Response({"active":active_driver,"total":total_driver})
 
+class TotalRide(APIView):
+    def get_created_ride(self):
+        try:
+            return Ride.objects.filter(status=1).count()
+        except Ride.DoesNotExist:
+            raise_exception=True 
 
+    def get_completed_ride(self):
+        try:
+            return Ride.objects.filter(status=5).count()
+        except Ride.DoesNotExist:
+            raise_exception=True
+
+    def get_cancel_ride(self):
+        try:
+            return Ride.objects.filter(status=4).count()
+        except Ride.DoesNotExist:
+            raise_exception=True
+                    
+    def get(self,request,format=None):
+        total_created=self.get_created_ride()
+        active_cancel=self.get_cancel_ride()
+        active_complete=self.get_completed_ride()
+
+        return Response({"created":total_created,"complete":active_complete,"cancel":active_cancel})
+
+class TotalTodayRides(APIView):
+    print(datetime.date.today)
+    
+    def get_created_ride(self):
+        try:
+            return Ride.objects.filter(status=1,date=d1).count()
+        except Ride.DoesNotExist:
+            raise_exception=True 
+
+    def get_completed_ride(self):
+        try:
+            return Ride.objects.filter(status=5,date=d1).count()
+        except Ride.DoesNotExist:
+            raise_exception=True
+
+    def get_cancel_ride(self):
+        try:
+            return Ride.objects.filter(status=4,date=d1).count()
+        except Ride.DoesNotExist:
+            raise_exception=True
+                    
+    def get(self,request,format=None):
+        
+        total_created=self.get_created_ride()
+        active_cancel=self.get_cancel_ride()
+        active_complete=self.get_completed_ride()
+
+        return Response({"created":total_created,"complete":active_complete,"cancel":active_cancel})

@@ -14,7 +14,7 @@ from .views import (
     )
 
 from .views import (DriverPofile,Login,ActiveLogin,ActiveDrivers, RideCreationView, getEarnings,RideHistory, NotificationView)
-from .views import (AdminLogin,DriverPofile,Login,ActiveLogin,ActiveDrivers, RideCreationView, getEarnings,RideHistory,UserViewSet)
+from .views import (TotalTodayRides,TotalRide,TotalDriver,AdminLogin,DriverPofile,Login,ActiveLogin,ActiveDrivers, RideCreationView, getEarnings,RideHistory,UserViewSet)
 
 urlpatterns=[
     path('profile/',DriverPofile.as_view()),
@@ -27,7 +27,13 @@ urlpatterns=[
     path('alerts/',NotificationView.as_view()),
     path('alldriver/',UserViewSet.as_view({'get': 'list'})),
     path('image/',UpdateProfilePicView.as_view()),
-    path('adminlogin/',AdminLogin.as_view())
+    path('adminlogin/',AdminLogin.as_view()),
+    path('totaldriver/',TotalDriver.as_view()),
+    path('totalride/',TotalRide.as_view()),
+    path('totaltodayride/',TotalTodayRides.as_view()),
+    
+    
+    
 
 
 ]
