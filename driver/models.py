@@ -16,7 +16,7 @@ class Driver(models.Model):
     age=models.IntegerField()
     workers = models.IntegerField(default=1)
     username=models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,default="bhole")
-
+    vehicle_type  = models.CharField(max_length=255,default="Open")
     def __str__(self):
         return '%s , %s'%(self.username,self.locations)
 
@@ -104,7 +104,18 @@ class activeLogin(models.Model):
     def __str__(self):
         return "%s --> %s"%(self.location,self.username)
 
-    
+    def  toDriver(self):
+        #user_details =  User.objects.get(username=self.username)
+        vehicle_type = Driver.objects.get(username =self.username).vehicle_type
+        return  {
+            'username':self.username,
+            'active':self.active,
+            'status':self.status,
+            'location':self.location,
+            'type':vehicle_type,
+            'price': 0 if vehicle_type == "Open"  else 10
+        }
+
 
 class AppSetting(models.Model):
     name  = models.CharField(max_length = 55)
