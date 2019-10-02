@@ -314,7 +314,7 @@ class ActiveDrivers(APIView):
         
         active = activeLogin.objects.filter(active=1)
         bc = list(active.values())
-        mc = [ level_1(x,[lat,lng]) for x in bc]
+        mc = [ level_1(x,[lat,lng]) for x.toDriver() in bc]
         dk = [cvt(x) for x in mc if x.get('display') is True]
         
         return JsonResponse(
